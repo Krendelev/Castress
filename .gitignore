@@ -106,3 +106,5 @@ venv.bak/
 # my stuff
 .vscode/
 config.py
+working/
+.DS_Store
