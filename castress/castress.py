@@ -1,4 +1,6 @@
-ACCENTS = {"джуниор": "дж+униор"}
+import string
+
+accents = {"джуниор": "дж+униор", "Джуниор": "Дж+униор"}
 
 
 def get_articles_urls():
@@ -58,8 +60,10 @@ def place_accents(text):
     Аргумент: текст, словарь ударений
     Результат: текст статьи с ударениями в словах
     """
-
-    pass
+    for word, accented_word in accents.items():
+        corrected_text = text.replace(word, accented_word)
+        text = corrected_text
+    return text
 
 
 def get_text_chunk():
@@ -96,3 +100,8 @@ def save_audio():
     Результат: файл на диске или в базе
     """
     pass
+
+
+if __name__ == "__main__":
+    text = "Джуниор, джуниоров джуниора."
+    assert place_accents(text) == "Дж+униор, дж+униоров дж+униора."
