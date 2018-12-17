@@ -52,7 +52,7 @@ def parse_article():
     pass
 
 
-def place_accents(text):
+def place_accents(text, accents):
     """
     Расставить ударения
     Аргумент: текст, словарь ударений
