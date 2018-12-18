@@ -1,3 +1,6 @@
+accents = {"джуниор": "дж+униор", "Джуниор": "Дж+униор"}
+
+
 def get_articles_urls():
     """
     Собрать url статей
@@ -49,13 +52,16 @@ def parse_article():
     pass
 
 
-def place_accents():
+def place_accents(text, accents):
     """
     Расставить ударения
     Аргумент: текст, словарь ударений
     Результат: текст статьи с ударениями в словах
     """
-    pass
+    for word, accented_word in accents.items():
+        corrected_text = text.replace(word, accented_word)
+        text = corrected_text
+    return text
 
 
 def get_text_chunk():
