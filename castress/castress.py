@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 from datetime import date
 
@@ -16,6 +17,13 @@ hubs = {
     "futurenow",
     "artificial_intelligence",
 }
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    filename="castress.log",
+)
+logger = logging.getLogger(__name__)
 
 
 def get_page(base_url, extension=""):
@@ -42,7 +50,7 @@ def create_connection(db_file):
         conn = sqlite3.connect(db_file)
         return conn
     except sqlite3.Error as e:
-        print(e)
+        logger.error(e)
     return None
 
 
@@ -51,13 +59,12 @@ def save_articles_url(urls, db_file):
 
     today = date.today().isoformat()
     conn = create_connection(db_file)
-    if conn is None:
-        print("Error connecting to database")
-    curs = conn.cursor()
-    for url in urls:
-        if not url_saved(url, curs):
-            curs.execute("INSERT INTO articles VALUES (?,?)", (today, url))
-    conn.commit()
+    if conn is not None:
+        curs = conn.cursor()
+        for url in urls:
+            if not url_saved(url, curs):
+                curs.execute("INSERT INTO articles VALUES (?,?)", (today, url))
+        conn.commit()
     conn.close()
 
 
