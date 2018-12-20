@@ -55,13 +55,13 @@ def save_articles_url(urls, db_file):
         print("Error connecting to database")
     curs = conn.cursor()
     for url in urls:
-        if not url_processed(url, curs):
+        if not url_saved(url, curs):
             curs.execute("INSERT INTO articles VALUES (?,?)", (today, url))
     conn.commit()
     conn.close()
 
 
-def url_processed(url, cursor):
+def url_saved(url, cursor):
     """Проверить наличие url в базе"""
     cursor.execute("SELECT link FROM articles WHERE link=?", (url,))
     return cursor.fetchone()
