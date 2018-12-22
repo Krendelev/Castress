@@ -1,7 +1,5 @@
 from bs4 import BeautifulSoup
 
-html = open("test.html", "r", encoding="utf-8")
-
 
 def count_insertions(html):
     """
