@@ -1,5 +1,9 @@
 from bs4 import BeautifulSoup
 
+html = open("test.html", "r", encoding="utf-8")
+SYMBOL_LIMIT = 2000
+accents = {"джуниор": "дж+униор", "Джуниор": "Дж+униор"}
+
 
 def parse_article(html):
     """
@@ -17,9 +21,58 @@ def parse_article(html):
     )
     text = text_with_tags.get_text()
     # все вместе
-    all_text = (" {0} {1}").format(header, text)
+    all_text = ("{0}\n{1}").format(header, text)
+    all_text = all_text.replace("\n", " ")
     return all_text
 
 
+def count_insertions(html):
+    """
+    Посчитать количество вставок (код, картинки) в статье
+    Аргумент: объект BeautifulSoup
+    Результат: количество картинок в статье
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    article_soup = soup.find(
+        "div", class_="post__text post__text-html js-mediator-article"
+    )
+    try:
+        article_image = article_soup.find_all("img")
+        count_article_image = len(article_image)
+    except AttributeError:
+        count_article_image = 0
+    return count_article_image
+
+
+def place_accents(all_text, accents):
+    """
+    Расставить ударения
+    Аргумент: текст, словарь ударений
+    Результат: текст статьи с ударениями в словах
+    """
+    for word, accented_word in accents.items():
+        corrected_text = all_text.replace(word, accented_word)
+        all_text = corrected_text
+    return all_text
+
+
+def get_text_chunk(all_text):
+    """
+    Вырезать фрагмент текста не больше определенного размера
+    Аргумент: текст, размер
+    Результат: синтаксически полный фрагмент текста
+    """
+    all_text = all_text.split(". ")
+    text_cake = []
+    text_cake_len = 0
+    for text_piece in all_text:
+        if not text_cake_len + len(text_piece) > SYMBOL_LIMIT:
+            text_cake_len += len(text_piece)
+            text_cake.append(text_piece)
+    separator = ". "
+    return separator.join(text_cake)
+
+
 if __name__ == "__main__":
-    parse_article(html)
+    get_text_chunk(place_accents(parse_article(html), accents))
+    count_insertions(html)
