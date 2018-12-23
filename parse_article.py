@@ -52,6 +52,27 @@ def count_insertions(html):
         return None
 
 
+def the_presence_of_code(html):
+    """
+    Проверить статью на наличие кода
+    Аргумент: объект BeautifulSoup
+    Результат: информация о наличии кода в статье
+    """
+    try:
+        soup = BeautifulSoup(html, "html.parser")
+        tag_code_soup = soup.find(
+            "div", class_="post__text post__text-html js-mediator-article"
+        )
+        try:
+            code = tag_code_soup.find("code")
+            code = code.get_text()
+            return True
+        except AttributeError:
+            return False
+    except:
+        return None
+
+
 def saved_synopses(html):
     """
     Сохранить синопсисы
@@ -103,3 +124,4 @@ if __name__ == "__main__":
     get_text_chunk(place_accents(parse_article(html), accents))
     count_insertions(html)
     saved_synopses(html)
+    the_presence_of_code(html)
