@@ -18,28 +18,16 @@ logger = logging.getLogger(__name__)
 
 
 def start(bot, update):
-    # keyboard = [
-    #     [InlineKeyboardButton("Option 1", callback_data="1")],
-    #     [InlineKeyboardButton("Option 2", callback_data="2")],
-    #     [InlineKeyboardButton("Option 3", callback_data="3")],
-    # ]
 
-    # reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_keyboard = [
+        ["Управление персоналом", "Карьера в IT-индустрии"],
+        ["Научно-популярное", "Законодательство в IT"],
+    ]
+    reply_markup = ReplyKeyboardMarkup(
+        reply_keyboard, one_time_keyboard=True, resize_keyboard=True
+    )
 
-    reply_keyboard = [["Тема подкаста 1"], ["Тема подкаста 2"], ["Тема подкаста 3"]]
-    reply_markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-
-    update.message.reply_text("Please choose:", reply_markup=reply_markup)
-
-
-# def button(bot, update):
-#     query = update.callback_query
-
-#     bot.edit_message_text(
-#         text="Selected option: {}".format(query.data),
-#         chat_id=query.message.chat_id,
-#         message_id=query.message.message_id,
-#     )
+    update.message.reply_text("Выберите хаб:", reply_markup=reply_markup)
 
 
 def unknown(bot, update):
@@ -57,7 +45,6 @@ def main():
     updater = Updater(TOKEN, request_kwargs=PROXY)
 
     updater.dispatcher.add_handler(CommandHandler("start", start))
-    # updater.dispatcher.add_handler(CallbackQueryHandler(button))
     updater.dispatcher.add_error_handler(error)
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
@@ -67,3 +54,74 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def start():
+    """
+    Вывести список команд и список тем подкастов
+    Результат: отправка пользователю ссылки на скачивание подкаста
+    """
+    pass
+
+
+def choose_theme():
+    """
+    Вывести список тем подкастов
+    """
+    pass
+
+
+def save_user_visit():
+    """
+    Записать обращение пользователя в базу
+    Аргумент: message.chat.username, message.date
+    Результат: запись в базе
+    """
+    pass
+
+
+def check_user_visits():
+    """
+    Проверить в какие дни пользователь обращался к боту
+    (или наоборот, не обращался)
+    Аргумент: message.chat.username
+    Результат: список дат
+    """
+    pass
+
+
+def list_unheard():
+    """
+    Выдать список подкастов вышедших в дни когда пользователь не обращался к боту
+    Аргумент: message.chat.username, список дат
+    Результат: список ссылок на подкасты
+    """
+    pass
+
+
+def get_podcast():
+    """
+    Выдать ссылку на подкаст
+    Аргумент: тема подкаста, дата
+    Результат: ссылка на подкаст
+    """
+    pass
+
+
+def get_on_date():
+    """
+    Выдать ссылку на подкаст
+    Аргумент: дата, тема
+    Результат: ссылка на подкаст
+    """
+    pass
+
+
+def unknown():
+    """Обработчик нераспознанных команд"""
+    pass
+
+
+def error():
+    """Обработчик ошибок"""
+    pass
