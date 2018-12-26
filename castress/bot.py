@@ -27,7 +27,7 @@ def start(bot, update):
         reply_keyboard, one_time_keyboard=True, resize_keyboard=True
     )
 
-    update.message.reply_text("Выберите хаб:", reply_markup=reply_markup)
+    update.message.reply_text("Выберите хаб", reply_markup=reply_markup)
 
 
 def unknown(bot, update):
