@@ -17,7 +17,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(bot, update):
+def start(bot, update, user_data):
+    print(user_data)
 
     reply_keyboard = [
         ["Управление персоналом", "Карьера в IT-индустрии"],
@@ -44,7 +45,7 @@ def main():
     # to use proxy add argument: request_kwargs=PROXY
     updater = Updater(TOKEN, request_kwargs=PROXY)
 
-    updater.dispatcher.add_handler(CommandHandler("start", start))
+    updater.dispatcher.add_handler(CommandHandler("start", start, pass_user_data=True))
     updater.dispatcher.add_error_handler(error)
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
@@ -54,14 +55,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-def start():
-    """
-    Вывести список команд и список тем подкастов
-    Результат: отправка пользователю ссылки на скачивание подкаста
-    """
-    pass
 
 
 def choose_theme():
@@ -114,14 +107,4 @@ def get_on_date():
     Аргумент: дата, тема
     Результат: ссылка на подкаст
     """
-    pass
-
-
-def unknown():
-    """Обработчик нераспознанных команд"""
-    pass
-
-
-def error():
-    """Обработчик ошибок"""
     pass
