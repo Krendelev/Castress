@@ -1,29 +1,10 @@
-import logging
 import sqlite3
 from datetime import date
 
 import requests
 from bs4 import BeautifulSoup
 
-hubs = {
-    "hr_management",
-    "career",
-    "popular_science",
-    "pm",
-    "space",
-    "business-laws",
-    "health",
-    "itcompanies",
-    "futurenow",
-    "artificial_intelligence",
-}
-
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    filename="castress.log",
-)
-logger = logging.getLogger(__name__)
+from config import BASE_URL, DB_NAME, HUBS, logger
 
 
 def get_page(base_url, extension=""):
@@ -46,6 +27,7 @@ def get_articles_urls(page):
 
 def create_connection(db_file):
     """Создать коннект к базе"""
+
     try:
         conn = sqlite3.connect(db_file)
         return conn
@@ -70,13 +52,17 @@ def save_articles_url(urls, db_file):
 
 def url_saved(url, cursor):
     """Проверить наличие url в базе"""
-    cursor.execute("SELECT link FROM articles WHERE link=?", (url,))
-    return cursor.fetchone()
+
+    try:
+        cursor.execute("SELECT link FROM articles WHERE link=?", (url,))
+        return cursor.fetchone()
+    except sqlite3.Error as e:
+        logger.error(e)
 
 
 if __name__ == "__main__":
-    url = "https://habr.com/hub/"
-    db = "castress.db"
-    source = get_page(url, "space")
-    urls = get_articles_urls(source)
-    save_articles_url(urls, db)
+    urls = []
+    for hub in HUBS:
+        source = get_page(BASE_URL, hub)
+        urls.extend(get_articles_urls(source))
+    save_articles_url(urls, DB_NAME)
