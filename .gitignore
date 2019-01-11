@@ -108,3 +108,4 @@ venv.bak/
 config.py
 working/
 .DS_Store
+*.mp3
