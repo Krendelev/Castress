@@ -1,25 +1,33 @@
-def get_audio():
-    """
-    Получить аудиоверсию текста
-    Аргумент: текст
-    Результат: объект с аудио
-    """
-    pass
+import requests
+from config import YANDEX, TTS_URL
 
 
-def join_audio():
-    """
-    Соединить фрагменты аудио
-    Аргумент: массив объектов с аудио
-    Результат: объект с аудио
-    """
-    pass
+def get_audio(text):
+    payload = {
+        "text": text,
+        "format": "mp3",
+        "lang": "ru-RU",
+        "speaker": "oksana",
+        "key": YANDEX,
+    }
+    try:
+        return requests.get(TTS_URL, params=payload, timeout=(1, 5)).content
+    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+        return None
 
 
-def save_audio():
-    """
-    Сохранить аудиофайл
-    Аргумент: объект с аудио
-    Результат: файл на диске или в базе
-    """
-    pass
+def save_audio(audio, file_name):
+    with open(file_name, "wb") as fh:
+        for piece in audio:
+            fh.write(piece)
+
+
+if __name__ == "__main__":
+    sample_text = [
+        "Однажды, в студёную зимнюю пору",
+        "Я из лесу вышел; был сильный мороз.",
+        "Гляжу, поднимается медленно в гору",
+        "Лошадка, везущая хворосту воз.",
+    ]
+    pieces = [get_audio(text) for text in sample_text]
+    save_audio(pieces, "test.mp3")
