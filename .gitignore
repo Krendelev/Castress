@@ -108,9 +108,13 @@ venv.bak/
 config.py
 working/
 .DS_Store
+<<<<<<< HEAD
 
 
 pro.txt
 synopsis.py
 test.html
 test.txt
+=======
+*.mp3
+>>>>>>> 05d8c7d01c66f2b7530c61038764b3a93bc8c973
