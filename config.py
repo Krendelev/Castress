@@ -9,6 +9,7 @@ PROXY = {
 
 YANDEX = "069b6659-984b-4c5f-880e-aaedcfd84102"
 TTS_URL = "https://tts.voicetech.yandex.net/generate"
+limit = 2000
 
 BASE_URL = "https://habr.com/hub/"
 HUBS = {

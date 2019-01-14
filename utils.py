@@ -4,7 +4,7 @@ from datetime import date
 import requests
 from bs4 import BeautifulSoup
 
-from config import YANDEX, TTS_URL, BASE_URL, DB_NAME, HUBS, accents, logger
+from config import YANDEX, TTS_URL, BASE_URL, DB_NAME, HUBS, accents, limit, logger
 
 
 # TRANSPORT
@@ -83,16 +83,14 @@ def parse_article(html):
     return all_text
 
 
-def count_insertions(html):
+def count_pictures(html):
     """
-    Посчитать количество вставок (код, картинки) в статье
+    Посчитать количество картинок в статье
     """
     soup = BeautifulSoup(html, "html.parser")
     article_soup = soup.find("div", class_="post__text post__text-html")
     article_image = article_soup.find_all("img")
-    if article_image:
-        count_article_image = len(article_image)
-        return count_article_image
+    return len(article_image)
 
 
 def code_present(html):
@@ -104,15 +102,13 @@ def code_present(html):
     return tag_code_soup.find("code")
 
 
-def saved_synopses(html):
+def get_synopses(html):
     """
     Сохранить синопсисы
     """
     soup = BeautifulSoup(html, "html.parser")
-    soup_synopsis = soup.find("meta", {"name": "description"})
-    if soup_synopsis:
-        synopsis = soup_synopsis.get("content")
-        return synopsis
+    synopsis = soup.find("meta", {"name": "description"})
+    return synopsis.get("content")
 
 
 def place_accents(all_text, accents):
