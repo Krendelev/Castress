@@ -1,5 +1,5 @@
-from text_processing import cut_text_into_chunks
 import unittest
+from utils import cut_text_into_chunks
 
 
 class TestTextProcessing(unittest.TestCase):
@@ -17,4 +17,3 @@ class TestTextProcessing(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
