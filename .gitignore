@@ -105,6 +105,13 @@ venv.bak/
 
 # my stuff
 .vscode/
-config.py
+local_config.py
 working/
 .DS_Store
+
+
+pro.txt
+synopsis.py
+test.html
+test.txt
+*.mp3
