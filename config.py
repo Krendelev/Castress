@@ -2,27 +2,22 @@ import logging
 
 from local_config import *
 
-PROXY = {
-    "proxy_url": "socks5://t1.learn.python.ru:1080",
-    "urllib3_proxy_kwargs": {"username": "learn", "password": "python"},
-}
 
-YANDEX = "069b6659-984b-4c5f-880e-aaedcfd84102"
 TTS_URL = "https://tts.voicetech.yandex.net/generate"
-limit = 2000
+limit = 1600
 
-BASE_URL = "https://habr.com/hub/"
+BASE_URL = "https://habr.com/ru/hub/"
 HUBS = {
     "hr_management",
-    "career",
-    "popular_science",
-    "pm",
-    "space",
-    "business-laws",
-    "health",
-    "itcompanies",
-    "futurenow",
-    "artificial_intelligence",
+    # "career",
+    # "popular_science",
+    # "pm",
+    # "space",
+    # "business-laws",
+    # "health",
+    # "itcompanies",
+    # "futurenow",
+    # "artificial_intelligence",
 }
 
 DB_NAME = "castress.db"
