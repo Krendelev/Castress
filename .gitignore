@@ -108,7 +108,7 @@ venv.bak/
 local_config.py
 working/
 .DS_Store
-
+audio/
 
 pro.txt
 synopsis.py

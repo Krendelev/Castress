@@ -14,7 +14,7 @@ def get_page(base_url, extension=""):
     """Получить страницу"""
 
     try:
-        return requests.get(base_url + extension, timeout=(1, 5)).content
+        return requests.get(base_url + extension, timeout=(3.1, 5)).content
     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
         return None
 
@@ -39,97 +39,87 @@ def create_connection(db_file):
     return None
 
 
-def save_articles_url(urls, db_file):
-    """Сохранить url в базу"""
+def save_article_entry(article, connection):
+    """Сохранить запись о статье в базу"""
 
-    today = date.today().isoformat()
-    conn = create_connection(db_file)
-    if conn is not None:
-        curs = conn.cursor()
-        for url in urls:
-            if not url_saved(url, curs):
-                curs.execute("INSERT INTO articles VALUES (?,?)", (today, url))
-        conn.commit()
-    conn.close()
+    article["date"] = date.today().isoformat()
+    curs = connection.cursor()
+    curs.execute("INSERT INTO articles VALUES (?,?,?,?,?,?)", tuple(article.values()))
+    connection.commit()
+    connection.close()
 
 
-def url_saved(url, cursor):
+def url_saved(url, db):
     """Проверить наличие url в базе"""
 
-    try:
-        cursor.execute("SELECT link FROM articles WHERE link=?", (url,))
-        return cursor.fetchone()
-    except sqlite3.Error as e:
-        logger.error(e)
+    with sqlite3.connect(db) as conn:
+        curs = conn.cursor()
+        curs.execute("SELECT url FROM articles WHERE url=?", (url,))
+        return curs.fetchone()
 
 
 # TEXT PROCESSING
 
 
-def parse_article(html):
-    """
-    Извлечь текст
-    """
-    soup_text = BeautifulSoup(html, "html.parser")
-    # заголовок
-    header_with_tags = soup_text.find("title")
-    header = header_with_tags.get_text()
-    # текст
-    text_with_tags = soup_text.find("div", class_="post__text post__text-html")
-    text = text_with_tags.get_text()
-    # все вместе
-    all_text = ("{0}. {1}").format(header, text)
-    all_text = all_text.replace("\n", " ")
-    return all_text
+def get_article_id(page):
+    soup = BeautifulSoup(page, "html.parser")
+    return soup.article["id"]
 
 
-def count_pictures(html):
-    """
-    Посчитать количество картинок в статье
-    """
-    soup = BeautifulSoup(html, "html.parser")
-    article_soup = soup.find("div", class_="post__text post__text-html")
-    article_image = article_soup.find_all("img")
-    return len(article_image)
+def parse_article(page):
+    """Извлечь контент"""
+
+    soup = BeautifulSoup(page, "html.parser")
+    return soup.find("div", class_="post__wrapper")
 
 
-def code_present(html):
-    """
-    Проверить статью на наличие кода
-    """
-    soup = BeautifulSoup(html, "html.parser")
-    tag_code_soup = soup.find("div", class_="post__text post__text-html")
-    return tag_code_soup.find("code")
+def get_text(content):
+    """Извлечь текст"""
+
+    header = content.find("span", class_="post__title-text").get_text()
+    body = content.find(
+        "div", class_="post__text post__text-html js-mediator-article"
+    ).get_text()
+    return header, body
 
 
-def get_synopses(html):
-    """
-    Сохранить синопсисы
-    """
-    soup = BeautifulSoup(html, "html.parser")
-    synopsis = soup.find("meta", {"name": "description"})
-    return synopsis.get("content")
+def get_synopsis(page):
+    """Извлечь синопсис"""
+
+    soup = BeautifulSoup(page, "html.parser")
+    return soup.find("meta", {"name": "description"}).get("content")
 
 
-def place_accents(all_text, accents):
-    """
-    Расставить ударения
-    """
+def picture_count(content):
+    """Посчитать количество картинок в статье"""
+
+    images = content.find_all("img")
+    return len(images)
+
+
+def code_present(content):
+    """Проверить статью на наличие кода"""
+
+    return content.find("code")
+
+
+def place_accents(text, accents):
+    """Расставить ударения"""
+
     for word, accented_word in accents.items():
-        corrected_text = all_text.replace(word, accented_word)
-        all_text = corrected_text
-    return all_text
+        corrected_text = text.replace(word, accented_word)
+        text = corrected_text
+    return text
 
 
-def cut_text_into_chunks(all_text, limit):
-    """
-    Получить текст разбитый на куски не больше определенного размера
-    """
+def cut_text_into_chunks(text, limit):
+    """Получить текст разбитый на куски не больше определенного размера"""
+
     start = 0
     chunks = []
-    while start < len(all_text):
-        breakpnt = all_text.rfind(".", start, start + limit)
-        chunks.append(all_text[start : breakpnt + 1].strip())
+    while start < len(text):
+        breakpnt = text.rfind(".", start, start + limit)
+        chunks.append(text[start : breakpnt + 1].strip())
         start = breakpnt + 1
     return chunks
 
@@ -146,12 +136,12 @@ def get_audio(text):
         "key": YANDEX,
     }
     try:
-        return requests.get(TTS_URL, params=payload, timeout=(1, 5)).content
+        return requests.get(TTS_URL, params=payload, timeout=(3.1, 5)).content
     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
         return None
 
 
-def save_audio(audio_chunks, file_name):
-    with open(file_name, "wb") as fh:
+def save_audio(audio_chunks, file_path):
+    with open(file_path, "wb") as fh:
         for chunk in audio_chunks:
             fh.write(chunk)
