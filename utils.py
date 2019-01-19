@@ -124,6 +124,19 @@ def cut_text_into_chunks(text, limit):
     return chunks
 
 
+def get_img_and_video(content, tag):
+    """ Получить списки с ссылками на видео и изображения из статьи
+    tag "img" - images, tag 'iframe' - 'video'
+    """
+
+    urls = content.find_all(tag, {"class": ""})
+    urls_list = []
+    for url in urls:
+        url = url.get("src")
+        urls_list.append(url)
+    return urls_list
+
+
 # AUDIO PROCESSING
 
 
