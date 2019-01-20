@@ -137,6 +137,25 @@ def get_img_and_video(content, tag):
     return urls_list
 
 
+def replace_tags(content, urls_list, tag):
+    """ Врезать в объект BeautifulSoup отсылки на изображения и видео """
+
+    if tag == "img":
+        replace_string = " Смотрите изображене "
+    elif tag == "iframe":
+        replace_string = " Смотрите видеоролик "
+    else:
+        pass
+
+    count_url = 1
+    for url in urls_list:
+        url = getattr(content, tag)
+        ((url.replace_with(replace_string + str(count_url))).get("src"))
+        count_url += 1
+
+    return content
+
+
 # AUDIO PROCESSING
 
 
