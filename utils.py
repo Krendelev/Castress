@@ -124,36 +124,15 @@ def cut_text_into_chunks(text, limit):
     return chunks
 
 
-def get_img_and_video(content, tag):
-    """ Получить списки с ссылками на видео и изображения из статьи
-    tag "img" - images, tag 'iframe' - 'video'
+def get_media_links(content):
+    """Получить список с ссылками на видео и изображения из статьи
+    Ссылки заменить на текст вида 'Смотри изображение 1'
     """
-
-    urls = content.find_all(tag, {"class": ""})
-    urls_list = []
-    for url in urls:
-        url = url.get("src")
-        urls_list.append(url)
-    return urls_list
-
-
-def replace_tags(content, urls_list, tag):
-    """ Врезать в объект BeautifulSoup отсылки на изображения и видео """
-
-    if tag == "img":
-        replace_string = " Смотрите изображене "
-    elif tag == "iframe":
-        replace_string = " Смотрите видеоролик "
-    else:
-        pass
-
-    count_url = 1
-    for url in urls_list:
-        url = getattr(content, tag)
-        ((url.replace_with(replace_string + str(count_url))).get("src"))
-        count_url += 1
-
-    return content
+    replacement = {"img": "Смотри изображение", "iframe": "Смотри видео"}
+    urls = content.find_all(replacement.keys(), class_="")
+    for i, url in enumerate(urls, start=1):
+        url.replace_with(" {} {}. ".format(replacement[url.name], i))
+    return [url.get("src") for url in urls]
 
 
 # AUDIO PROCESSING
