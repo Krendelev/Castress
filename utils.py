@@ -128,10 +128,11 @@ def get_media_links(content):
     """Получить список с ссылками на видео и изображения из статьи
     Ссылки заменить на текст вида 'Смотри изображение 1'
     """
-    replacement = {"img": "Смотри изображение", "iframe": "Смотри видео"}
-    urls = content.find_all(replacement.keys(), class_="")
-    for i, url in enumerate(urls, start=1):
-        url.replace_with(" {} {}. ".format(replacement[url.name], i))
+    to_replace = {"img": "Смотри изображение", "iframe": "Смотри видео"}
+    urls = content.find_all(to_replace.keys(), class_="")
+    for i, node in enumerate(urls, start=1):
+        replacement = " {} {}. ".format(to_replace[node.name], i)
+        node.replace_with(replacement)
     return [url.get("src") for url in urls]
 
 
