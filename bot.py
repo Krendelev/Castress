@@ -37,11 +37,14 @@ def topic_button(bot, update):
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
     )
+
+    # title, performer, caption - настроить после реализации функции запроса из базы
     bot.send_audio(
         chat_id=query.message.chat_id,
         audio=open("{}.mp3".format(query.data), "rb"),
         title=query.data,
         performer="Castress",
+        caption=HUBS[query.data],
     )
 
 
