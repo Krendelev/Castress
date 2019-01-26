@@ -13,16 +13,15 @@ limit = 2000
 
 BASE_URL = "https://habr.com/hub/"
 HUBS = {
-    "hr_management",
-    "career",
-    "popular_science",
-    "pm",
-    "space",
-    "business-laws",
-    "health",
-    "itcompanies",
-    "futurenow",
-    "artificial_intelligence",
+    "hr_management": "Управление персоналом",
+    "career": "Карьера в IT-индустрии",
+    "popular_science": "Научно-популярное",
+    "read": "Читальный зал",
+    "space": "Космонавтика",
+    "business-laws": "Законодательство в IT",
+    "health": "Здоровье гика",
+    "history": "История IT",
+    "futurenow": "Будущее здесь",
 }
 
 DB_NAME = "castress.db"
