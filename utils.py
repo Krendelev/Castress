@@ -28,36 +28,6 @@ def get_articles_urls(page):
     ]
 
 
-def create_connection(db_file):
-    """Создать коннект к базе"""
-
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except sqlite3.Error as e:
-        logger.error(e)
-    return None
-
-
-def save_article_entry(article, connection):
-    """Сохранить запись о статье в базу"""
-
-    article["date"] = date.today().isoformat()
-    curs = connection.cursor()
-    curs.execute("INSERT INTO articles VALUES (?,?,?,?,?,?)", tuple(article.values()))
-    connection.commit()
-    connection.close()
-
-
-def url_saved(url, db):
-    """Проверить наличие url в базе"""
-
-    with sqlite3.connect(db) as conn:
-        curs = conn.cursor()
-        curs.execute("SELECT url FROM articles WHERE url=?", (url,))
-        return curs.fetchone()
-
-
 # TEXT PROCESSING
 
 
@@ -71,6 +41,18 @@ def parse_article(page):
 
     soup = BeautifulSoup(page, "html.parser")
     return soup.find("div", class_="post__wrapper")
+
+
+def get_media_links(content):
+    """Получить список с ссылками на видео и изображения из статьи
+    Ссылки заменить на текст вида 'Смотри изображение 1'
+    """
+    to_replace = {"img": "Смотри изображение", "iframe": "Смотри видео"}
+    urls = content.find_all(to_replace.keys(), class_="")
+    for i, node in enumerate(urls, start=1):
+        replacement = " {} {}. ".format(to_replace[node.name], i)
+        node.replace_with(replacement)
+    return [url.get("src") for url in urls]
 
 
 def get_text(content):
@@ -122,18 +104,6 @@ def cut_text_into_chunks(text, limit):
         chunks.append(text[start : breakpnt + 1].strip())
         start = breakpnt + 1
     return chunks
-
-
-def get_media_links(content):
-    """Получить список с ссылками на видео и изображения из статьи
-    Ссылки заменить на текст вида 'Смотри изображение 1'
-    """
-    to_replace = {"img": "Смотри изображение", "iframe": "Смотри видео"}
-    urls = content.find_all(to_replace.keys(), class_="")
-    for i, node in enumerate(urls, start=1):
-        replacement = " {} {}. ".format(to_replace[node.name], i)
-        node.replace_with(replacement)
-    return [url.get("src") for url in urls]
 
 
 # AUDIO PROCESSING

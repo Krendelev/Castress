@@ -1,18 +1,18 @@
 import os
 
 from config import BASE_URL, DB_NAME, HUBS
+from database import *
 from utils import *
 
 
 def main():
 
     article = {
-        "date": None,
         "hub": None,
         "url": None,
+        "habr_id": None,
         "header": None,
         "synopsis": None,
-        "filepath": None,
     }
     urls = []
 
