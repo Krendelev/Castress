@@ -7,7 +7,6 @@ PROXY = {
     "urllib3_proxy_kwargs": {"username": "learn", "password": "python"},
 }
 
-YANDEX = "069b6659-984b-4c5f-880e-aaedcfd84102"
 TTS_URL = "https://tts.voicetech.yandex.net/generate"
 limit = 2000
 

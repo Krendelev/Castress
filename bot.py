@@ -1,5 +1,5 @@
 import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -7,7 +7,9 @@ from telegram.ext import (
     MessageHandler,
     Filters,
 )
-from config import PROXY, TOKEN
+
+from config import PROXY, HUBS
+from local_config import BOT_API_KEY
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -18,17 +20,21 @@ logger = logging.getLogger(__name__)
 
 
 def start(bot, update, user_data):
-    print(user_data)
-
-    reply_keyboard = [
-        ["Управление персоналом", "Карьера в IT-индустрии"],
-        ["Научно-популярное", "Законодательство в IT"],
+    keyboard = [
+        [InlineKeyboardButton("{0}".format(HUBS[hub]), callback_data="{0}".format(hub))]
+        for hub in HUBS
     ]
-    reply_markup = ReplyKeyboardMarkup(
-        reply_keyboard, one_time_keyboard=True, resize_keyboard=True
-    )
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text("Выберите хаб", reply_markup=reply_markup)
+    update.message.reply_text("Пожалуйста выберите тему:", reply_markup=reply_markup)
+
+
+def topic_button(bot, update):
+    query = update.callback_query
+
+    bot.send_audio(
+        chat_id=query.message.chat_id, audio=open("{}.mp3".format(query.data), "rb")
+    )
 
 
 def unknown(bot, update):
@@ -43,9 +49,10 @@ def error(bot, update, error):
 
 def main():
     # to use proxy add argument: request_kwargs=PROXY
-    updater = Updater(TOKEN, request_kwargs=PROXY)
+    updater = Updater(BOT_API_KEY, request_kwargs=PROXY)
 
     updater.dispatcher.add_handler(CommandHandler("start", start, pass_user_data=True))
+    updater.dispatcher.add_handler(CallbackQueryHandler(topic_button))
     updater.dispatcher.add_error_handler(error)
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
