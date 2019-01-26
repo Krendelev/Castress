@@ -32,8 +32,16 @@ def start(bot, update, user_data):
 def topic_button(bot, update):
     query = update.callback_query
 
+    bot.edit_message_text(
+        text="Сегодня мы предлагаем послушать следующие подкасты:",
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id,
+    )
     bot.send_audio(
-        chat_id=query.message.chat_id, audio=open("{}.mp3".format(query.data), "rb")
+        chat_id=query.message.chat_id,
+        audio=open("{}.mp3".format(query.data), "rb"),
+        title=query.data,
+        performer="Castress",
     )
 
 
