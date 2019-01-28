@@ -1,4 +1,3 @@
-import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Updater,
@@ -8,15 +7,7 @@ from telegram.ext import (
     Filters,
 )
 
-from config import PROXY, HUBS
-from local_config import BOT_API_KEY
-
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    filename="bot.log",
-)
-logger = logging.getLogger(__name__)
+from config import PROXY, HUBS, BOT_API_KEY, logger
 
 
 def start(bot, update, user_data):
@@ -41,7 +32,7 @@ def topic_button(
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
     )
-    for podcast_file in podcast_files:
+    for _ in podcast_files:
         # podcast_files подразумевается, как список путей к файлам из базы по теме
         if not sql_file_id:
             # поправить под запрос sql, вместо query.data будет podcast_file
