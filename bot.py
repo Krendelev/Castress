@@ -29,7 +29,11 @@ def start(bot, update, user_data):
     update.message.reply_text("Пожалуйста выберите тему:", reply_markup=reply_markup)
 
 
-def topic_button(bot, update):
+def topic_button(
+    bot, update, sql_file_id="CQADAgAD2AIAAgaKgEo950dmpUgg3wI", podcast_files=[]
+):
+    """Если убрать цикл for, все работает? Для проверки со списком нужна база"""
+    # podcast_files type is list
     query = update.callback_query
 
     bot.edit_message_text(
@@ -37,15 +41,29 @@ def topic_button(bot, update):
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
     )
+    for podcast_file in podcast_files:
+        # podcast_files подразумевается, как список путей к файлам из базы по теме
+        if not sql_file_id:
+            # поправить под запрос sql, вместо query.data будет podcast_file
+            bot_audio = open("{}.mp3".format(query.data), "rb")
+            # for test
+            print("upload")
+        else:
+            bot_audio = sql_file_id
+            # for test
+            print("server")
 
-    # title, performer, caption - настроить после реализации функции запроса из базы
-    bot.send_audio(
-        chat_id=query.message.chat_id,
-        audio=open("{}.mp3".format(query.data), "rb"),
-        title=query.data,
-        performer="Castress",
-        caption=HUBS[query.data],
-    )
+        # title, performer, caption - настроить после реализации функции запроса из базы
+        msg = bot.send_audio(
+            chat_id=query.message.chat_id,
+            audio=bot_audio,
+            title=query.data,
+            performer="Castress",
+            caption=HUBS[query.data],
+        )
+
+        # file_id for test
+        print(msg.audio.file_id)
 
 
 def unknown(bot, update):
