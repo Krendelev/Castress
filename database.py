@@ -1,6 +1,5 @@
 import sqlite3
 from datetime import date
-import pprint
 
 from config import DB_NAME, logger
 
@@ -22,7 +21,8 @@ def create_tables(connection):
             date text,
             url text NOT NULL UNIQUE,
             habr_id text UNIQUE,
-            hub text
+            hub text,
+            file_id text UNIQUE
             );
             CREATE TABLE IF NOT EXISTS parts (
             header text,
@@ -89,6 +89,20 @@ def insert_media_links(connection, links, key):
         curs.executemany(sql, row)
 
 
+def insert_file_id(connection, file_id, article_id):
+    """
+    Insert file_id for certain article in database
+
+    :param connection: connection object
+    :param file_id: id given to file by Telegram server
+    :param article_id: id of article to retrieve habr_id for
+    """
+    with connection:
+        curs = connection.cursor()
+        sql = "UPDATE articles SET file_id=(?) WHERE id=(?)"
+        curs.execute(sql, (file_id, article_id))
+
+
 def retrieve_parts(connection, date, hub):
     """
     Retrieve headers and synopses for certain date and hub from database
@@ -122,15 +136,16 @@ def retrieve_media_links(connection, article_id):
     return [link[0] for link in links]
 
 
-def retrieve_habr_id(connection, article_id):
+def retrieve_id(connection, article_id, column):
     """
-    Retrieve habr_id for certain article from database
+    Retrieve habr_id or file_id for certain article from database
 
     :param connection: connection object
-    :param article_id: id of article to retrieve habr_id for
-    :returns: habr_id
+    :param article_id: id of article to retrieve id for
+    :param column: column containing id
+    :returns: id
     """
     curs = connection.cursor()
-    sql = "SELECT habr_id FROM articles WHERE id=(?)"
+    sql = "SELECT {column} FROM articles WHERE id=(?)".format(column=column)
     curs.execute(sql, (article_id,))
     return curs.fetchone()[0]
