@@ -1,15 +1,24 @@
 import logging
 from collections import OrderedDict
 
-from local_config import *
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    filename="castress.log",
+)
+logger = logging.getLogger(__name__)
 
+PROXY = {
+    "proxy_url": "socks5://t1.learn.python.ru:1080",
+    "urllib3_proxy_kwargs": {"username": "learn", "password": "python"},
+}
 
 TTS_URL = "https://tts.voicetech.yandex.net/generate"
-limit = 1600
-
+BASE_URL = "https://habr.com/hub/"
 DB_NAME = "castress.db"
 
-BASE_URL = "https://habr.com/ru/hub/"
+limit = 1600
+
 HUBS = {
     "hr_management": "Управление персоналом",
     "career": "Карьера в IT-индустрии",
@@ -31,12 +40,6 @@ accents = {
     "Твердотельный": "Твердот+ельный",
 }
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    filename="castress.log",
-)
-logger = logging.getLogger(__name__)
 
 
 class DotDict(OrderedDict):
@@ -45,3 +48,6 @@ class DotDict(OrderedDict):
     __getattr__ = OrderedDict.get
     __setattr__ = OrderedDict.__setitem__
     __delattr__ = OrderedDict.__delitem__
+
+
+from local_config import *

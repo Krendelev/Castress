@@ -53,6 +53,7 @@ coverage.xml
 
 # Django stuff:
 *.log
+*.db
 local_settings.py
 db.sqlite3
 
@@ -109,11 +110,4 @@ local_config.py
 working/
 .DS_Store
 audio/
-
-pro.txt
-synopsis.py
-test.html
-test.txt
 *.mp3
-
-cut_images_href.py
