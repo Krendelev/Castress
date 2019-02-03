@@ -53,6 +53,7 @@ coverage.xml
 
 # Django stuff:
 *.log
+*.db
 local_settings.py
 db.sqlite3
 
@@ -108,11 +109,5 @@ venv.bak/
 local_config.py
 working/
 .DS_Store
-
-
-pro.txt
-synopsis.py
-test.html
-test.txt
+audio/
 *.mp3
-test_bot.py
