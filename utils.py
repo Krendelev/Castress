@@ -1,11 +1,10 @@
 import sqlite3
-from datetime import date
 
 import requests
 from bs4 import BeautifulSoup
 
 from config import YANDEX, TTS_URL, BASE_URL, DB_NAME, HUBS, accents, limit, logger
-
+from database import *
 
 # TRANSPORT
 

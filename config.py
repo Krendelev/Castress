@@ -1,4 +1,5 @@
 import logging
+from collections import OrderedDict
 
 from local_config import *
 
@@ -6,21 +7,22 @@ from local_config import *
 TTS_URL = "https://tts.voicetech.yandex.net/generate"
 limit = 1600
 
+DB_NAME = "castress.db"
+
 BASE_URL = "https://habr.com/ru/hub/"
 HUBS = {
-    "hr_management",
-    # "career",
-    # "popular_science",
-    # "pm",
-    # "space",
-    # "business-laws",
-    # "health",
-    # "itcompanies",
-    # "futurenow",
-    # "artificial_intelligence",
+    "hr_management": "Управление персоналом",
+    "career": "Карьера в IT-индустрии",
+    "popular_science": "Научно-популярное",
+    "read": "Читальный зал",
+    "space": "Космонавтика",
+    "business-laws": "Законодательство в IT",
+    "health": "Здоровье гика",
+    "history": "История IT",
+    "futurenow": "Будущее здесь",
 }
 
-DB_NAME = "castress.db"
+PICTURE_LIMIT = 5
 
 accents = {
     "джуниор": "дж+униор",
@@ -35,3 +37,11 @@ logging.basicConfig(
     filename="castress.log",
 )
 logger = logging.getLogger(__name__)
+
+
+class DotDict(OrderedDict):
+    """dot.notation access to dictionary attributes"""
+
+    __getattr__ = OrderedDict.get
+    __setattr__ = OrderedDict.__setitem__
+    __delattr__ = OrderedDict.__delitem__
