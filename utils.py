@@ -1,9 +1,18 @@
-import sqlite3
-
+import pathlib
 import requests
 from bs4 import BeautifulSoup
 
-from config import YANDEX, TTS_URL, BASE_URL, DB_NAME, HUBS, accents, limit, logger
+from config import (
+    YANDEX,
+    TTS_URL,
+    BASE_URL,
+    DB_NAME,
+    HUBS,
+    AUDIO_DIR,
+    accents,
+    limit,
+    logger,
+)
 from database import *
 
 # TRANSPORT
@@ -25,6 +34,10 @@ def get_articles_urls(page):
     return [
         link.get("href") for link in content.find_all("a", class_="post__title_link")
     ]
+
+
+def get_file_path(name):
+    return AUDIO_DIR.joinpath(name).with_suffix(".mp3")
 
 
 # TEXT PROCESSING
@@ -122,7 +135,8 @@ def get_audio(text):
         return None
 
 
-def save_audio(audio_chunks, file_path):
-    with open(file_path, "wb") as fh:
+def save_audio(audio_chunks, name):
+
+    with open(get_file_path(name), "wb") as fh:
         for chunk in audio_chunks:
             fh.write(chunk)

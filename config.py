@@ -1,4 +1,5 @@
 import logging
+import pathlib
 from collections import OrderedDict
 
 logging.basicConfig(
@@ -12,6 +13,8 @@ PROXY = {
     "proxy_url": "socks5://t1.learn.python.ru:1080",
     "urllib3_proxy_kwargs": {"username": "learn", "password": "python"},
 }
+
+AUDIO_DIR = pathlib.Path.cwd().joinpath("audio")
 
 TTS_URL = "https://tts.voicetech.yandex.net/generate"
 BASE_URL = "https://habr.com/hub/"
@@ -39,7 +42,6 @@ accents = {
     "твердотельный": "твердот+ельный",
     "Твердотельный": "Твердот+ельный",
 }
-
 
 
 class DotDict(OrderedDict):
