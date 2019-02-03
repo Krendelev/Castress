@@ -11,10 +11,10 @@ from config import PROXY, HUBS, BOT_API_KEY, logger
 
 
 def start(bot, update, user_data):
-    keyboard = [
-        [InlineKeyboardButton("{0}".format(HUBS[hub]), callback_data="{0}".format(hub))]
-        for hub in HUBS
-    ]
+    keyboard = tuple(
+        [InlineKeyboardButton(name, callback_data=sysname)]
+        for sysname, name in HUBS.items()
+    )
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.message.reply_text("Пожалуйста выберите тему:", reply_markup=reply_markup)
