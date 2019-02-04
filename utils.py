@@ -145,7 +145,7 @@ def get_audio(text):
 def save_audio(audio_chunks, name):
 
     audio = sum(AudioSegment.from_file(io.BytesIO(chunk)) for chunk in audio_chunks)
-    audio.export(get_file_path(name), format="mp3", bitrate="64k")
+    audio.export(get_file_path(name), format="mp3", bitrate="56k")
 
 
 if __name__ == "__main__":
