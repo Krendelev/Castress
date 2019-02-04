@@ -146,12 +146,3 @@ def save_audio(audio_chunks, name):
 
     audio = sum(AudioSegment.from_file(io.BytesIO(chunk)) for chunk in audio_chunks)
     audio.export(get_file_path(name), format="mp3", bitrate="56k")
-
-
-if __name__ == "__main__":
-    with open("test_text.txt") as fh:
-        text = fh.read()
-
-    chunks = cut_text_into_chunks(text, limit)
-    audio_chunks = [get_audio(text) for text in chunks]
-    save_audio(audio_chunks, "final")
