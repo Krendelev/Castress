@@ -20,7 +20,7 @@ TTS_URL = "https://tts.voicetech.yandex.net/generate"
 BASE_URL = "https://habr.com/hub/"
 DB_NAME = "castress.db"
 
-limit = 1600
+limit = 1700
 
 HUBS = {
     "hr_management": "Управление персоналом",
