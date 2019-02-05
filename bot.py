@@ -1,13 +1,17 @@
+from datetime import date
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
-    Updater,
-    CommandHandler,
     CallbackQueryHandler,
-    MessageHandler,
+    CommandHandler,
     Filters,
+    MessageHandler,
+    Updater,
 )
 
-from config import PROXY, HUBS, BOT_API_KEY, logger
+from config import BOT_API_KEY, HUBS, PROXY, logger
+from database import *
+from utils import *
 
 
 def start(bot, update, user_data):
@@ -20,11 +24,7 @@ def start(bot, update, user_data):
     update.message.reply_text("Пожалуйста выберите тему:", reply_markup=reply_markup)
 
 
-def topic_button(
-    bot, update, sql_file_id="CQADAgAD2AIAAgaKgEo950dmpUgg3wI", podcast_files=[]
-):
-    """Если убрать цикл for, все работает? Для проверки со списком нужна база"""
-    # podcast_files type is list
+def topic_button(bot, update):
     query = update.callback_query
 
     bot.edit_message_text(
@@ -32,29 +32,31 @@ def topic_button(
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
     )
-    for _ in podcast_files:
-        # podcast_files подразумевается, как список путей к файлам из базы по теме
-        if not sql_file_id:
-            # поправить под запрос sql, вместо query.data будет podcast_file
-            bot_audio = open("{}.mp3".format(query.data), "rb")
-            # for test
-            print("upload")
-        else:
-            bot_audio = sql_file_id
-            # for test
-            print("server")
+    connect = create_connection(DB_NAME)
+    articles = retrieve_parts(connect, date.today(), HUBS[query.data])
 
-        # title, performer, caption - настроить после реализации функции запроса из базы
-        msg = bot.send_audio(
+    for article in articles:
+        header, synopsis, article_id = article
+        file_id = retrieve_id(connect, article_id, "file_id")
+        file_name = retrieve_id(connect, article_id, "habr_id")
+
+        audio = file_id or get_file_path(file_name).open("rb")
+        message_sent = bot.send_audio(
             chat_id=query.message.chat_id,
-            audio=bot_audio,
-            title=query.data,
-            performer="Castress",
-            caption=HUBS[query.data],
+            audio=audio,
+            title=" ",
+            performer=header,
+            caption=synopsis,
         )
 
-        # file_id for test
-        print(msg.audio.file_id)
+        if not file_id:
+            insert_file_id(connect, message_sent["audio"]["file_id"], article_id)
+
+
+def run_app(bot, job):
+    from app import main as base_upload
+
+    base_upload()
 
 
 def unknown(bot, update):

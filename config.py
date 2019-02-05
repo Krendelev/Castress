@@ -2,6 +2,8 @@ import logging
 import pathlib
 from collections import OrderedDict
 
+from local_config import *
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
@@ -34,7 +36,7 @@ HUBS = {
     "futurenow": "Будущее здесь",
 }
 
-PICTURE_LIMIT = 5
+PICTURE_LIMIT = 1
 
 accents = {
     "джуниор": "дж+униор",
@@ -50,6 +52,3 @@ class DotDict(OrderedDict):
     __getattr__ = OrderedDict.get
     __setattr__ = OrderedDict.__setitem__
     __delattr__ = OrderedDict.__delitem__
-
-
-from local_config import *
