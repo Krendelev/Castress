@@ -1,5 +1,4 @@
 import os
-
 from datetime import date
 
 from config import BASE_URL, DB_NAME, HUBS, PICTURE_LIMIT, DotDict
@@ -30,7 +29,7 @@ def main():
             article.hub = HUBS[hub]
             article.habr_id = get_article_id(page)
             parts.synopsis = get_synopsis(page)
-            media_links = get_media_links(content)
+            # media_links = get_media_links(content)
             parts.header, body = get_text(content)
 
             parts.article_id = insert_entry(connect, "articles", article)
@@ -42,6 +41,7 @@ def main():
 
             audio_chunks = [get_audio(text) for text in text_chunks]
             save_audio(audio_chunks, article.habr_id)
+            print("Done processing an article")
 
     connect.close()
 

@@ -1,6 +1,9 @@
+import io
 import pathlib
 import requests
+
 from bs4 import BeautifulSoup
+from pydub import AudioSegment
 
 from config import (
     YANDEX,
@@ -113,7 +116,10 @@ def cut_text_into_chunks(text, limit):
     chunks = []
     while start < len(text):
         breakpnt = text.rfind(".", start, start + limit)
-        chunks.append(text[start : breakpnt + 1].strip())
+        if breakpnt == -1:
+            chunks.append(text[start:])
+            return chunks
+        chunks.append(text[start : breakpnt + 1])
         start = breakpnt + 1
     return chunks
 
@@ -122,6 +128,7 @@ def cut_text_into_chunks(text, limit):
 
 
 def get_audio(text):
+
     payload = {
         "text": text,
         "format": "mp3",
@@ -137,6 +144,5 @@ def get_audio(text):
 
 def save_audio(audio_chunks, name):
 
-    with open(get_file_path(name), "wb") as fh:
-        for chunk in audio_chunks:
-            fh.write(chunk)
+    audio = sum(AudioSegment.from_file(io.BytesIO(chunk)) for chunk in audio_chunks)
+    audio.export(get_file_path(name), format="mp3", bitrate="56k")

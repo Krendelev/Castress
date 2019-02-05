@@ -2,6 +2,8 @@ import logging
 import pathlib
 from collections import OrderedDict
 
+from local_config import *
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
@@ -20,7 +22,7 @@ TTS_URL = "https://tts.voicetech.yandex.net/generate"
 BASE_URL = "https://habr.com/hub/"
 DB_NAME = "castress.db"
 
-limit = 1600
+limit = 1700
 
 HUBS = {
     "hr_management": "Управление персоналом",
@@ -34,7 +36,7 @@ HUBS = {
     "futurenow": "Будущее здесь",
 }
 
-PICTURE_LIMIT = 5
+PICTURE_LIMIT = 1
 
 accents = {
     "джуниор": "дж+униор",
@@ -50,6 +52,3 @@ class DotDict(OrderedDict):
     __getattr__ = OrderedDict.get
     __setattr__ = OrderedDict.__setitem__
     __delattr__ = OrderedDict.__delitem__
-
-
-from local_config import *

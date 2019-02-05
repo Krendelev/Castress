@@ -111,3 +111,4 @@ working/
 .DS_Store
 audio/
 *.mp3
+*.db
