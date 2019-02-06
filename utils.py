@@ -1,17 +1,19 @@
 import io
 import pathlib
-import requests
+from datetime import date
 
+import requests
 from bs4 import BeautifulSoup
 from pydub import AudioSegment
 
+import dbase
 from config import (
-    YANDEX,
-    TTS_URL,
+    AUDIO_DIR,
     BASE_URL,
     DB_NAME,
     HUBS,
-    AUDIO_DIR,
+    TTS_URL,
+    YANDEX,
     accents,
     limit,
     logger,
@@ -40,6 +42,26 @@ def get_articles_urls(page):
 
 def get_file_path(name):
     return AUDIO_DIR.joinpath(name).with_suffix(".mp3")
+
+
+def retrieve_articles(hub):
+    connect = dbase.create_connection(DB_NAME)
+    previews = dbase.retrieve_previews(connect, date.today(), hub)
+    messages = []
+    for preview in previews:
+        header, synopsis, article_id = preview
+        file_id = dbase.retrieve_id(connect, article_id, "file_id")
+        file_name = dbase.retrieve_id(connect, article_id, "habr_id")
+        audio = file_id or get_file_path(file_name).open("rb")
+        messages.append((header, synopsis, article_id, audio))
+    connect.close()
+    return messages
+
+
+def save_audio_ids(audio_ids):
+    connect = dbase.create_connection(DB_NAME)
+    dbase.insert_file_ids(connect, audio_ids)
+    connect.close()
 
 
 # TEXT PROCESSING
