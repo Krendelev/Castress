@@ -9,7 +9,7 @@ from utils import *
 def main():
 
     article = DotDict(date=date.today().isoformat(), url=None, habr_id=None, hub=None)
-    parts = DotDict(header=None, synopsis=None, article_id=None)
+    preview = DotDict(header=None, synopsis=None, article_id=None)
 
     connect = create_connection(DB_NAME)
     create_tables(connect)
@@ -28,15 +28,15 @@ def main():
             article.url = url
             article.hub = HUBS[hub]
             article.habr_id = get_article_id(page)
-            parts.synopsis = get_synopsis(page)
+            preview.synopsis = get_synopsis(page)
             # media_links = get_media_links(content)
-            parts.header, body = get_text(content)
+            preview.header, body = get_text(content)
 
-            parts.article_id = insert_entry(connect, "articles", article)
-            insert_entry(connect, "parts", parts)
-            insert_media_links(connect, media_links, parts.article_id)
+            preview.article_id = insert_entry(connect, "articles", article)
+            insert_entry(connect, "previews", preview)
+            # insert_media_links(connect, media_links, parts.article_id)
 
-            text = "{}. {}".format(parts.header, body)
+            text = "{}. {}".format(preview.header, body)
             text_chunks = cut_text_into_chunks(text, limit)
 
             audio_chunks = [get_audio(text) for text in text_chunks]

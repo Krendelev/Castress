@@ -16,7 +16,6 @@ from config import (
     limit,
     logger,
 )
-from database import *
 
 # TRANSPORT
 

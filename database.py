@@ -24,7 +24,7 @@ def create_tables(connection):
             hub text,
             file_id text UNIQUE
             );
-            CREATE TABLE IF NOT EXISTS parts (
+            CREATE TABLE IF NOT EXISTS previews (
             header text,
             synopsis text,
             article_id integer NOT NULL,
@@ -103,7 +103,7 @@ def insert_file_id(connection, file_id, article_id):
         curs.execute(sql, (file_id, article_id))
 
 
-def retrieve_parts(connection, date, hub):
+def retrieve_previews(connection, date, hub):
     """
     Retrieve headers and synopses for certain date and hub from database
 
@@ -114,7 +114,7 @@ def retrieve_parts(connection, date, hub):
     :returns: list of tuples with header, synopsis and article_id
     """
     curs = connection.cursor()
-    sql = """SELECT header, synopsis, article_id FROM parts
+    sql = """SELECT header, synopsis, article_id FROM previews
         INNER JOIN articles ON articles.id=parts.article_id
         WHERE articles.date=(?) AND articles.hub=(?)"""
     curs.execute(sql, (date.isoformat(), hub))

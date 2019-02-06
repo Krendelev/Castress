@@ -9,7 +9,7 @@ from telegram.ext import (
     Updater,
 )
 
-from config import BOT_API_KEY, HUBS, PROXY, logger
+from config import BOT_API_KEY, HUBS, PROXY, DB_NAME, UPDATE_TIME, logger
 from database import *
 from utils import *
 
@@ -33,10 +33,10 @@ def topic_button(bot, update):
         message_id=query.message.message_id,
     )
     connect = create_connection(DB_NAME)
-    articles = retrieve_parts(connect, date.today(), HUBS[query.data])
+    previews = retrieve_previews(connect, date.today(), HUBS[query.data])
 
-    for article in articles:
-        header, synopsis, article_id = article
+    for preview in previews:
+        header, synopsis, article_id = preview
         file_id = retrieve_id(connect, article_id, "file_id")
         file_name = retrieve_id(connect, article_id, "habr_id")
 
@@ -72,6 +72,8 @@ def error(bot, update, error):
 def main():
     # to use proxy add argument: request_kwargs=PROXY
     updater = Updater(BOT_API_KEY, request_kwargs=PROXY)
+
+    updater.job_queue.run_daily(run_app, time=UPDATE_TIME)
 
     updater.dispatcher.add_handler(CommandHandler("start", start, pass_user_data=True))
     updater.dispatcher.add_handler(CallbackQueryHandler(topic_button))
