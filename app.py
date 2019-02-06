@@ -34,13 +34,13 @@ def main():
 
             parts.article_id = insert_entry(connect, "articles", article)
             insert_entry(connect, "parts", parts)
-            insert_media_links(connect, media_links, parts.article_id)
+            # insert_media_links(connect, media_links, parts.article_id)
 
             text = "{}. {}".format(parts.header, body)
             text_chunks = cut_text_into_chunks(text, limit)
 
-            audio_chunks = [get_audio(text) for text in text_chunks]
-            save_audio(audio_chunks, article.habr_id)
+            # audio_chunks = [get_audio(text) for text in text_chunks]
+            # save_audio(audio_chunks, article.habr_id)
             print("Done processing an article")
 
     connect.close()
