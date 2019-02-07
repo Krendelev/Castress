@@ -28,6 +28,18 @@ def bot_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
+def restart_keyboard():
+    restart_button = [[InlineKeyboardButton("к списку хабов", callback_data="start")]]
+    return InlineKeyboardMarkup(restart_button)
+
+
+def restart(bot, update):
+    query = update.callback_query
+    bot.send_message(
+        text="Вернемся", reply_markup=bot_keyboard(), chat_id=query.message.chat_id
+    )
+
+
 def send_articles(bot, update):
     query = update.callback_query
 
@@ -54,9 +66,7 @@ def send_articles(bot, update):
     utils.save_audio_ids(audio_ids)
 
     bot.send_message(
-        text="Пожалуйста выберите тему:",
-        reply_markup=bot_keyboard(),
-        chat_id=query.message.chat_id,
+        text="Вернемся", reply_markup=restart_keyboard(), chat_id=query.message.chat_id
     )
 
 
@@ -82,6 +92,7 @@ def main():
     updater.job_queue.run_daily(run_app, time=UPDATE_TIME)
 
     updater.dispatcher.add_handler(CommandHandler("start", start, pass_user_data=True))
+    updater.dispatcher.add_handler(CallbackQueryHandler(restart, pattern="start"))
     updater.dispatcher.add_handler(CallbackQueryHandler(send_articles))
     updater.dispatcher.add_error_handler(error)
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
