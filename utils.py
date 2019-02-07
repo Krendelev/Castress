@@ -105,7 +105,7 @@ def get_synopsis(page):
     """Извлечь синопсис"""
 
     soup = BeautifulSoup(page, "html.parser")
-    return soup.find("meta", {"name": "description"}).get("content")
+    return (soup.find("meta", {"name": "description"}).get("content")).replace("\n", "")
 
 
 def picture_count(content):
