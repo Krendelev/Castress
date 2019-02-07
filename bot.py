@@ -16,13 +16,16 @@ import utils
 
 
 def start(bot, update, user_data):
+
+    update.message.reply_text("Пожалуйста выберите тему:", reply_markup=bot_keyboard())
+
+
+def bot_keyboard():
     keyboard = tuple(
         [InlineKeyboardButton(name, callback_data=sysname)]
         for sysname, name in HUBS.items()
     )
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
-    update.message.reply_text("Пожалуйста выберите тему:", reply_markup=reply_markup)
+    return InlineKeyboardMarkup(keyboard)
 
 
 def send_articles(bot, update):
@@ -49,6 +52,12 @@ def send_articles(bot, update):
         if not isinstance(audio, str):
             audio_ids.append((message_sent["audio"]["file_id"], article_id))
     utils.save_audio_ids(audio_ids)
+
+    bot.send_message(
+        text="Пожалуйста выберите тему:",
+        reply_markup=bot_keyboard(),
+        chat_id=query.message.chat_id,
+    )
 
 
 def run_app(bot, job):

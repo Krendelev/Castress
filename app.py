@@ -34,16 +34,14 @@ def main():
             preview.synopsis = utils.get_synopsis(page)
             # media_links = get_media_links(content)
             preview.header, body = utils.get_text(content)
-
             preview.article_id = dbase.insert_entry(connect, "articles", article)
             dbase.insert_entry(connect, "previews", preview)
             # insert_media_links(connect, media_links, preview.article_id)
-
             text = "{}. {}".format(preview.header, body)
             text_chunks = utils.cut_text_into_chunks(text, limit)
 
             audio_chunks = [utils.get_audio(text) for text in text_chunks]
-            utils.save_audio(audio_chunks, article.habr_id)
+            utils.save_audio(audio_chunks, article.habr_id
             print("Done processing an article")
 
     connect.close()
