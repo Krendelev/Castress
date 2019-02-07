@@ -9,9 +9,10 @@ from telegram.ext import (
     Updater,
 )
 
-from config import BOT_API_KEY, HUBS, PROXY, logger
-from database import *
-from utils import *
+from config import BOT_API_KEY, HUBS, PROXY, DB_NAME, UPDATE_TIME, logger
+import app
+import dbase
+import utils
 
 
 def start(bot, update, user_data):
@@ -27,7 +28,7 @@ def bot_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-def topic_button(bot, update):
+def send_articles(bot, update):
     query = update.callback_query
 
     bot.edit_message_text(
@@ -35,15 +36,11 @@ def topic_button(bot, update):
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
     )
-    connect = create_connection(DB_NAME)
-    articles = retrieve_parts(connect, date.today(), HUBS[query.data])
+    audio_ids = []
+    articles = utils.retrieve_articles(HUBS[query.data])
 
     for article in articles:
-        header, synopsis, article_id = article
-        file_id = retrieve_id(connect, article_id, "file_id")
-        file_name = retrieve_id(connect, article_id, "habr_id")
-
-        audio = file_id or get_file_path(file_name).open("rb")
+        header, synopsis, article_id, audio = article
         message_sent = bot.send_audio(
             chat_id=query.message.chat_id,
             audio=audio,
@@ -52,8 +49,9 @@ def topic_button(bot, update):
             caption=synopsis,
         )
 
-        if not file_id:
-            insert_file_id(connect, message_sent["audio"]["file_id"], article_id)
+        if not isinstance(audio, str):
+            audio_ids.append((message_sent["audio"]["file_id"], article_id))
+    utils.save_audio_ids(audio_ids)
 
     bot.send_message(
         text="Пожалуйста выберите тему:",
@@ -63,9 +61,8 @@ def topic_button(bot, update):
 
 
 def run_app(bot, job):
-    from app import main as base_upload
 
-    base_upload()
+    app.main()
 
 
 def unknown(bot, update):
@@ -82,8 +79,10 @@ def main():
     # to use proxy add argument: request_kwargs=PROXY
     updater = Updater(BOT_API_KEY, request_kwargs=PROXY)
 
+    updater.job_queue.run_daily(run_app, time=UPDATE_TIME)
+
     updater.dispatcher.add_handler(CommandHandler("start", start, pass_user_data=True))
-    updater.dispatcher.add_handler(CallbackQueryHandler(topic_button))
+    updater.dispatcher.add_handler(CallbackQueryHandler(send_articles))
     updater.dispatcher.add_error_handler(error)
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 

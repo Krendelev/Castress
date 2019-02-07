@@ -24,7 +24,7 @@ def create_tables(connection):
             hub text,
             file_id text UNIQUE
             );
-            CREATE TABLE IF NOT EXISTS parts (
+            CREATE TABLE IF NOT EXISTS previews (
             header text,
             synopsis text,
             article_id integer NOT NULL,
@@ -89,21 +89,21 @@ def insert_media_links(connection, links, key):
         curs.executemany(sql, row)
 
 
-def insert_file_id(connection, file_id, article_id):
+def insert_file_ids(connection, file_ids):
     """
     Insert file_id for certain article in database
 
     :param connection: connection object
     :param file_id: id given to file by Telegram server
-    :param article_id: id of article to retrieve habr_id for
+    :param article_id: id of article to insert file_id for
     """
     with connection:
         curs = connection.cursor()
         sql = "UPDATE articles SET file_id=(?) WHERE id=(?)"
-        curs.execute(sql, (file_id, article_id))
+        curs.executemany(sql, file_ids)
 
 
-def retrieve_parts(connection, date, hub):
+def retrieve_previews(connection, date, hub):
     """
     Retrieve headers and synopses for certain date and hub from database
 
@@ -114,8 +114,8 @@ def retrieve_parts(connection, date, hub):
     :returns: list of tuples with header, synopsis and article_id
     """
     curs = connection.cursor()
-    sql = """SELECT header, synopsis, article_id FROM parts
-        INNER JOIN articles ON articles.id=parts.article_id
+    sql = """SELECT header, synopsis, article_id FROM previews
+        INNER JOIN articles ON articles.id=previews.article_id
         WHERE articles.date=(?) AND articles.hub=(?)"""
     curs.execute(sql, (date.isoformat(), hub))
     return curs.fetchall()
@@ -149,3 +149,12 @@ def retrieve_id(connection, article_id, column):
     sql = "SELECT {column} FROM articles WHERE id=(?)".format(column=column)
     curs.execute(sql, (article_id,))
     return curs.fetchone()[0]
+
+
+if __name__ == "__main__":
+    file_ids = [
+        ("CQADAgADqAIAAvHZ2UpRdnua4niVgQI", 9),
+        ("CQADAgADqQIAAvHZ2UqOeCrUpFMzywI", 10),
+    ]
+    conn = create_connection(DB_NAME)
+    insert_file_ids(conn, file_ids)

@@ -1,6 +1,7 @@
 import logging
 import pathlib
 from collections import OrderedDict
+from datetime import time
 
 from local_config import *
 
@@ -22,6 +23,7 @@ TTS_URL = "https://tts.voicetech.yandex.net/generate"
 BASE_URL = "https://habr.com/hub/"
 DB_NAME = "castress.db"
 
+UPDATE_TIME = time(0, 0, 0)
 limit = 1700
 
 HUBS = {
@@ -43,6 +45,7 @@ accents = {
     "Джуниор": "Дж+униор",
     "твердотельный": "твердот+ельный",
     "Твердотельный": "Твердот+ельный",
+    "ИТ": "айт+и",
 }
 
 
