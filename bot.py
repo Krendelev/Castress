@@ -22,34 +22,33 @@ def start(bot, update, user_data):
 
 def bot_keyboard():
     keyboard = tuple(
-        [InlineKeyboardButton(name, callback_data=sysname)]
-        for sysname, name in HUBS.items()
+        [InlineKeyboardButton(name, callback_data=name)] for name in HUBS.values()
     )
     return InlineKeyboardMarkup(keyboard)
 
 
 def restart_keyboard():
-    restart_button = [[InlineKeyboardButton("K списку хабов", callback_data="start")]]
+    restart_button = [[InlineKeyboardButton("⥪", callback_data="start")]]
     return InlineKeyboardMarkup(restart_button)
 
 
 def restart(bot, update):
     query = update.callback_query
     bot.send_message(
-        text="Вернемся", reply_markup=bot_keyboard(), chat_id=query.message.chat_id
+        text="Темы", reply_markup=bot_keyboard(), chat_id=query.message.chat_id
     )
 
 
 def send_articles(bot, update):
     query = update.callback_query
 
-    bot.edit_message_text(
-        text="Сегодня мы предлагаем послушать следующие подкасты:",
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id,
-    )
+    # bot.edit_message_text(
+    #     text="Сегодня мы предлагаем послушать следующие подкасты:",
+    #     chat_id=query.message.chat_id,
+    #     message_id=query.message.message_id,
+    # )
     audio_ids = []
-    articles = utils.retrieve_articles(HUBS[query.data])
+    articles = utils.retrieve_articles(query.data)
 
     for article in articles:
         header, synopsis, article_id, audio = article
@@ -66,7 +65,9 @@ def send_articles(bot, update):
     utils.save_audio_ids(audio_ids)
 
     bot.send_message(
-        text="Вернемся", reply_markup=restart_keyboard(), chat_id=query.message.chat_id
+        text="K списку хабов",
+        reply_markup=restart_keyboard(),
+        chat_id=query.message.chat_id,
     )
 
 
@@ -87,7 +88,7 @@ def error(bot, update, error):
 
 def main():
     # to use proxy add argument: request_kwargs=PROXY
-    updater = Updater(BOT_API_KEY, request_kwargs=PROXY)
+    updater = Updater(BOT_API_KEY)
 
     updater.job_queue.run_daily(run_app, time=UPDATE_TIME)
 
