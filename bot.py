@@ -42,11 +42,6 @@ def restart(bot, update):
 def send_articles(bot, update):
     query = update.callback_query
 
-    # bot.edit_message_text(
-    #     text="Сегодня мы предлагаем послушать следующие подкасты:",
-    #     chat_id=query.message.chat_id,
-    #     message_id=query.message.message_id,
-    # )
     audio_ids = []
     articles = utils.retrieve_articles(query.data)
 
@@ -88,7 +83,7 @@ def error(bot, update, error):
 
 def main():
     # to use proxy add argument: request_kwargs=PROXY
-    updater = Updater(BOT_API_KEY)
+    updater = Updater(BOT_API_KEY, request_kwargs=PROXY)
 
     updater.job_queue.run_daily(run_app, time=UPDATE_TIME)
 
