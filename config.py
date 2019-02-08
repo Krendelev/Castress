@@ -6,11 +6,20 @@ from datetime import time
 from local_config import *
 
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO,
     filename="castress.log",
 )
 logger = logging.getLogger(__name__)
+
+
+class DotDict(OrderedDict):
+    """dot.notation access to dictionary attributes"""
+
+    __getattr__ = OrderedDict.get
+    __setattr__ = OrderedDict.__setitem__
+    __delattr__ = OrderedDict.__delitem__
+
 
 PROXY = {
     "proxy_url": "socks5://t1.learn.python.ru:1080",
@@ -24,7 +33,7 @@ BASE_URL = "https://habr.com/hub/"
 DB_NAME = "castress.db"
 
 UPDATE_TIME = time(0, 0, 0)
-limit = 1700
+limit = 1500
 
 HUBS = {
     "hr_management": "Управление персоналом",
@@ -40,18 +49,11 @@ HUBS = {
 
 PICTURE_LIMIT = 1
 
-accents = {
+corrections = {
     "джуниор": "дж+униор",
     "Джуниор": "Дж+униор",
     "твердотельный": "твердот+ельный",
     "Твердотельный": "Твердот+ельный",
-    "ИТ": "айт+и",
+    "Даркнет": "Даркн+ет",
+    "даркнет": "даркн+ет",
 }
-
-
-class DotDict(OrderedDict):
-    """dot.notation access to dictionary attributes"""
-
-    __getattr__ = OrderedDict.get
-    __setattr__ = OrderedDict.__setitem__
-    __delattr__ = OrderedDict.__delitem__

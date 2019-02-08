@@ -1,5 +1,6 @@
 import io
 import pathlib
+import sys
 from datetime import date
 
 import requests
@@ -7,17 +8,7 @@ from bs4 import BeautifulSoup
 from pydub import AudioSegment
 
 import dbase
-from config import (
-    AUDIO_DIR,
-    BASE_URL,
-    DB_NAME,
-    HUBS,
-    TTS_URL,
-    YANDEX,
-    accents,
-    limit,
-    logger,
-)
+from config import *
 
 # TRANSPORT
 
@@ -105,7 +96,8 @@ def get_synopsis(page):
     """Извлечь синопсис"""
 
     soup = BeautifulSoup(page, "html.parser")
-    return (soup.find("meta", {"name": "description"}).get("content")).replace("\n", "")
+    synopsis = soup.find("meta", {"name": "description"}).get("content")
+    return synopsis.replace("\n", "")
 
 
 def picture_count(content):
@@ -121,10 +113,10 @@ def code_present(content):
     return content.find("code")
 
 
-def place_accents(text, accents):
+def correct_text(text, corrections):
     """Расставить ударения"""
 
-    for word, accented_word in accents.items():
+    for word, accented_word in corrections.items():
         corrected_text = text.replace(word, accented_word)
         text = corrected_text
     return text
@@ -158,9 +150,17 @@ def get_audio(text):
         "key": YANDEX,
     }
     try:
-        return requests.get(TTS_URL, params=payload, timeout=(3.1, 5)).content
-    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-        return None
+        response = requests.get(TTS_URL, params=payload, timeout=(3.1, 5))
+        if response.status_code == 414:
+            sys.exit("414 Request URI Too Large")
+        return response.content
+    except (
+        requests.exceptions.ConnectionError,
+        requests.exceptions.ReadTimeout,
+        requests.exceptions.HTTPError,
+    ) as err:
+        logger.error(err)
+        response.raise_for_status()
 
 
 def save_audio(audio_chunks, name):

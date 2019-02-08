@@ -29,7 +29,7 @@ def bot_keyboard():
 
 
 def restart_keyboard():
-    restart_button = [[InlineKeyboardButton("к списку хабов", callback_data="start")]]
+    restart_button = [[InlineKeyboardButton("K списку хабов", callback_data="start")]]
     return InlineKeyboardMarkup(restart_button)
 
 
