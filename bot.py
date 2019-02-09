@@ -17,16 +17,22 @@ import utils
 
 def start(bot, update, user_data):
 
-    markup = bot_keyboard()
+    markup = articles_keyboard()
     reply = "Пожалуйста выберите тему:"
 
     if not markup["inline_keyboard"]:
         reply = "К сожалению новых статей сегодня нет."
 
-    update.message.reply_text(reply, reply_markup=markup)
+    if update.message:
+        update.message.reply_text(reply, reply_markup=markup)
+    else:
+        query = update.callback_query
+        bot.send_message(
+            text="Темы:", reply_markup=markup, chat_id=query.message.chat_id
+        )
 
 
-def bot_keyboard():
+def articles_keyboard():
     keyboard = tuple(
         [InlineKeyboardButton(hub, callback_data=hub)]
         for hub in utils.retrieve_hubs(date.today())
@@ -34,19 +40,8 @@ def bot_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-def restart_keyboard():
-    restart_button = [[InlineKeyboardButton("↩️", callback_data="start")]]
-    return InlineKeyboardMarkup(restart_button)
-
-
-def restart(bot, update):
-    query = update.callback_query
-    bot.send_message(
-        text="Темы:", reply_markup=bot_keyboard(), chat_id=query.message.chat_id
-    )
-
-
 def send_articles(bot, update):
+
     query = update.callback_query
 
     audio_ids = []
@@ -67,10 +62,9 @@ def send_articles(bot, update):
             audio_ids.append((message_sent["audio"]["file_id"], article_id))
     utils.save_audio_ids(audio_ids)
 
+    markup = InlineKeyboardMarkup([[InlineKeyboardButton("↩️", callback_data="start")]])
     bot.send_message(
-        text="K списку хабов",
-        reply_markup=restart_keyboard(),
-        chat_id=query.message.chat_id,
+        text="K списку хабов", reply_markup=markup, chat_id=query.message.chat_id
     )
 
 
@@ -96,7 +90,9 @@ def main():
     updater.job_queue.run_daily(run_app, time=UPDATE_TIME)
 
     updater.dispatcher.add_handler(CommandHandler("start", start, pass_user_data=True))
-    updater.dispatcher.add_handler(CallbackQueryHandler(restart, pattern="start"))
+    updater.dispatcher.add_handler(
+        CallbackQueryHandler(start, pattern="start", pass_user_data=True)
+    )
     updater.dispatcher.add_handler(CallbackQueryHandler(send_articles))
     updater.dispatcher.add_error_handler(error)
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
