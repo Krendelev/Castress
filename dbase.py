@@ -103,6 +103,22 @@ def insert_file_ids(connection, file_ids):
         curs.executemany(sql, file_ids)
 
 
+def retrieve_updates(connection, date):
+    """
+    Retrieve hubs names which were updated on specified date from database
+
+    :param connection: connection object
+    :param date: date to retrieve content for
+    :type date: datetime.date
+    :returns: list of hub names
+    """
+    curs = connection.cursor()
+    sql = """SELECT DISTINCT hub FROM articles WHERE date=(?)"""
+    curs.execute(sql, (date.isoformat(),))
+    hubs = curs.fetchall()
+    return [hub[0] for hub in hubs]
+
+
 def retrieve_previews(connection, date, hub):
     """
     Retrieve headers and synopses for certain date and hub from database
@@ -152,9 +168,5 @@ def retrieve_id(connection, article_id, column):
 
 
 if __name__ == "__main__":
-    file_ids = [
-        ("CQADAgADqAIAAvHZ2UpRdnua4niVgQI", 9),
-        ("CQADAgADqQIAAvHZ2UqOeCrUpFMzywI", 10),
-    ]
     conn = create_connection(DB_NAME)
-    insert_file_ids(conn, file_ids)
+    print(retrieve_updates(conn, date.fromisoformat("2019-02-07")))

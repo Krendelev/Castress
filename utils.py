@@ -49,6 +49,13 @@ def retrieve_articles(hub):
     return messages
 
 
+def retrieve_hubs(date):
+    connect = dbase.create_connection(DB_NAME)
+    hubs = dbase.retrieve_updates(connect, date)
+    connect.close()
+    return hubs
+
+
 def save_audio_ids(audio_ids):
     connect = dbase.create_connection(DB_NAME)
     dbase.insert_file_ids(connect, audio_ids)

@@ -17,25 +17,32 @@ import utils
 
 def start(bot, update, user_data):
 
-    update.message.reply_text("Пожалуйста выберите тему:", reply_markup=bot_keyboard())
+    markup = bot_keyboard()
+    reply = "Пожалуйста выберите тему:"
+
+    if not markup["inline_keyboard"]:
+        reply = "К сожалению новых статей сегодня нет."
+
+    update.message.reply_text(reply, reply_markup=markup)
 
 
 def bot_keyboard():
     keyboard = tuple(
-        [InlineKeyboardButton(name, callback_data=name)] for name in HUBS.values()
+        [InlineKeyboardButton(hub, callback_data=hub)]
+        for hub in utils.retrieve_hubs(date.today())
     )
     return InlineKeyboardMarkup(keyboard)
 
 
 def restart_keyboard():
-    restart_button = [[InlineKeyboardButton("⥪", callback_data="start")]]
+    restart_button = [[InlineKeyboardButton("↩️", callback_data="start")]]
     return InlineKeyboardMarkup(restart_button)
 
 
 def restart(bot, update):
     query = update.callback_query
     bot.send_message(
-        text="Темы", reply_markup=bot_keyboard(), chat_id=query.message.chat_id
+        text="Темы:", reply_markup=bot_keyboard(), chat_id=query.message.chat_id
     )
 
 
@@ -49,6 +56,7 @@ def send_articles(bot, update):
         header, synopsis, article_id, audio = article
         message_sent = bot.send_audio(
             chat_id=query.message.chat_id,
+            timeout=20,
             audio=audio,
             title=" ",
             performer=header,
