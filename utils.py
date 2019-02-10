@@ -1,22 +1,14 @@
 import io
 import pathlib
-import requests
+import sys
+from datetime import date
 
+import requests
 from bs4 import BeautifulSoup
 from pydub import AudioSegment
 
-from config import (
-    YANDEX,
-    TTS_URL,
-    BASE_URL,
-    DB_NAME,
-    HUBS,
-    AUDIO_DIR,
-    accents,
-    limit,
-    logger,
-)
-from database import *
+import dbase
+from config import *
 
 # TRANSPORT
 
@@ -41,6 +33,33 @@ def get_articles_urls(page):
 
 def get_file_path(name):
     return AUDIO_DIR.joinpath(name).with_suffix(".mp3")
+
+
+def retrieve_articles(hub):
+    connect = dbase.create_connection(DB_NAME)
+    previews = dbase.retrieve_previews(connect, date.today(), hub)
+    messages = []
+    for preview in previews:
+        header, synopsis, article_id = preview
+        file_id = dbase.retrieve_id(connect, article_id, "file_id")
+        file_name = dbase.retrieve_id(connect, article_id, "habr_id")
+        audio = file_id or get_file_path(file_name).open("rb")
+        messages.append((header, synopsis, article_id, audio))
+    connect.close()
+    return messages
+
+
+def retrieve_hubs(date):
+    connect = dbase.create_connection(DB_NAME)
+    hubs = dbase.retrieve_updates(connect, date)
+    connect.close()
+    return hubs
+
+
+def save_audio_ids(audio_ids):
+    connect = dbase.create_connection(DB_NAME)
+    dbase.insert_file_ids(connect, audio_ids)
+    connect.close()
 
 
 # TEXT PROCESSING
@@ -84,7 +103,8 @@ def get_synopsis(page):
     """Извлечь синопсис"""
 
     soup = BeautifulSoup(page, "html.parser")
-    return soup.find("meta", {"name": "description"}).get("content")
+    synopsis = soup.find("meta", {"name": "description"}).get("content")
+    return synopsis.replace("\n", "")
 
 
 def picture_count(content):
@@ -100,10 +120,10 @@ def code_present(content):
     return content.find("code")
 
 
-def place_accents(text, accents):
+def correct_text(text, corrections):
     """Расставить ударения"""
 
-    for word, accented_word in accents.items():
+    for word, accented_word in corrections.items():
         corrected_text = text.replace(word, accented_word)
         text = corrected_text
     return text
@@ -137,9 +157,17 @@ def get_audio(text):
         "key": YANDEX,
     }
     try:
-        return requests.get(TTS_URL, params=payload, timeout=(3.1, 5)).content
-    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-        return None
+        response = requests.get(TTS_URL, params=payload, timeout=(3.1, 5))
+        if response.status_code == 414:
+            sys.exit("414 Request URI Too Large")
+        return response.content
+    except (
+        requests.exceptions.ConnectionError,
+        requests.exceptions.ReadTimeout,
+        requests.exceptions.HTTPError,
+    ) as err:
+        logger.error(err)
+        response.raise_for_status()
 
 
 def save_audio(audio_chunks, name):
