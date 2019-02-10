@@ -112,3 +112,6 @@ working/
 audio/
 *.mp3
 *.db
+
+#сертификаты для webhooks
+*.pem
