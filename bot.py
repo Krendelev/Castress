@@ -13,6 +13,7 @@ from config import BOT_API_KEY, NGROK_URL, HUBS, PROXY, DB_NAME, UPDATE_TIME, lo
 import app
 import dbase
 import utils
+from work_with_server import mode_selection
 
 
 def start(bot, update, user_data):
@@ -97,18 +98,7 @@ def main():
     updater.dispatcher.add_error_handler(error)
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
-    updater.start_webhook(
-        listen="0.0.0.0",
-        port=8443,
-        url_path=BOT_API_KEY,
-        # опциональный параметр
-        # key=open("private.key", "rb"),
-        # cert for ngrok
-        cert=open("cert.pem", "rb"),
-        webhook_url="{}{}".format(NGROK_URL, BOT_API_KEY),
-    )
-
-    updater.bot.setWebhook(NGROK_URL + BOT_API_KEY)
+    mode_selection(updater)
 
     updater.idle()
 

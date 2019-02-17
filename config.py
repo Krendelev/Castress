@@ -26,6 +26,9 @@ PROXY = {
     "urllib3_proxy_kwargs": {"username": "learn", "password": "python"},
 }
 
+# webhook or other
+MODE_SELECTION = "webhook"
+
 AUDIO_DIR = pathlib.Path.cwd().joinpath("audio")
 
 TTS_URL = "https://tts.voicetech.yandex.net/generate"
