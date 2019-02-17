@@ -113,6 +113,8 @@ audio/
 *.mp3
 *.db
 
+castress.db
+
 #сертификаты для webhooks
 *.pem
 *.key
