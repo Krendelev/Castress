@@ -37,7 +37,8 @@ def get_file_path(name):
 
 def retrieve_articles(hub):
     connect = dbase.create_connection(DB_NAME)
-    previews = dbase.retrieve_previews(connect, date.today(), hub)
+    # date.today()
+    previews = dbase.retrieve_previews(connect, date(2019, 2, 8), hub)
     messages = []
     for preview in previews:
         header, synopsis, article_id = preview
